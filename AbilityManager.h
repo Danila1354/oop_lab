@@ -8,15 +8,22 @@
 #include "BombardmentBuilder.h"
 #include <queue>
 #include <random>
+#include <Logger.h>
 
 class AbilityManager {
 private:
-    std::queue<std::unique_ptr<AbilityBuilder>> ability_builders;
+    std::queue<std::shared_ptr<AbilityBuilder>> ability_builders;
+    std::vector<std::shared_ptr<AbilityBuilder>> all_ability_builders;
+    Logger logger;
 public:
 
     AbilityManager();
 
-    void useAbility(GameField &field);
+    void useAbility(InfoHolder& info_holder);
+
+    void initializeAbilityBuilders();
+
+    void shuffleAbilityBuilders();
 
     void addRandomAbility();
 };

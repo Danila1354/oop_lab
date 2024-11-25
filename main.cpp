@@ -2,6 +2,8 @@
 #include "ShipManager.h"
 #include "AbilityManager.h"
 
+
+
 int main() {
     GameField field{10, 10};
     auto ship_manager = ShipManager(3, {3, 1, 2});
@@ -19,20 +21,24 @@ int main() {
         }
     }
     field.show();
+    CoordHolder coord_holder;
+    InfoHolder info_holder{field, ship_manager, coord_holder};
 
-//    try{
-//        field.attackCell(5,4);
-//    }
-//    catch (OutOfBoundsAttackException& e){
-//        std::cerr << "Error: " << e.what() << std::endl;
-//    }
-//    auto ability_manager = AbilityManager();
-//    try{
-//        ability_manager.useAbility(field);
-//    }
-//    catch (NoAbilitiesException& e){
-//        std::cerr << "Error: " << e.what() << std::endl;
-//    }
-//    field.show();
+    auto ability_manager = AbilityManager();
+    try{
+        ability_manager.useAbility(info_holder);
+    }
+    catch (NoAbilitiesException& e){
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+    try{
+        if (field.attackCell(5,4)){
+            ability_manager.addRandomAbility();
+        }
+    }
+    catch (OutOfBoundsAttackException& e){
+        std::cerr << "Error: " << e.what() << std::endl;
+    }
+    field.show();
     return 0;
 }

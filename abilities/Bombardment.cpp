@@ -1,39 +1,34 @@
 #include "Bombardment.h"
 
-bool Bombardment::apply(GameField &field) {
-    std::vector<std::pair<int, int>> attackable_segments;
-    for (int y = 0; y < field.getHeight(); ++y) {
-        for (int x = 0; x < field.getWidth(); ++x) {
-            auto &cell = field.getCell(x, y);
-            auto *pointer_to_ship = cell.getPointerToShip();
-            if (pointer_to_ship != nullptr &&
-                pointer_to_ship->getSegmentState(cell.getIndexOfSegment()) != SegmentState::Destroyed) {
-                attackable_segments.emplace_back(x, y);
-            }
+Bombardment::Bombardment(ShipManager &ship_manager) : ship_manager(ship_manager) {}
+
+
+
+AbilityResult Bombardment::apply() {
+    if (ship_manager.isAllShipsDestroyed()) {
+        return AbilityResult::AllShipsDestroyed;
+    }
+
+    std::vector<Ship*> not_destroyed_ships;
+    for (auto &ship: ship_manager.getShips()) {
+        if (!ship.isShipDestroyed()) {
+            not_destroyed_ships.push_back(&ship);
         }
     }
-    if (attackable_segments.empty()) {
-        return false;
-    }
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dist(0, attackable_segments.size() - 1);
-    auto [target_x, target_y] = attackable_segments[dist(gen)];
-    auto &target_cell = field.getCell(target_x, target_y);
-    auto *target_ship = target_cell.getPointerToShip();
-    auto index = target_cell.getIndexOfSegment();
-    target_ship->takeDamage(index);
-    if (target_ship->isShipDestroyed()){
-        if (target_ship->isVertical()){
-            for (int y = target_y-index;y<target_y-index+target_ship->getLength();y++){
-                field.getCell(target_x,y).open();
+    while (true) {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<int> ship_dist(0, not_destroyed_ships.size()-1);
+        auto random_ship = not_destroyed_ships[ship_dist(gen)];
+        std::uniform_int_distribution<int> segment_dist(0, random_ship->getLength()-1);
+        auto random_segment = segment_dist(gen);
+        if (random_ship->getSegmentState(random_segment) != SegmentState::Destroyed){
+            random_ship->takeDamage(random_segment);
+            if (random_ship->isShipDestroyed()) {
+                return AbilityResult::ShipDestroyed;
             }
-        }
-        else{
-            for (int x = target_x-index;x<target_x-index+target_ship->getLength();x++){
-                field.getCell(x,target_y).open();
-            }
+            break;
         }
     }
-    return target_ship->isShipDestroyed();
+    return AbilityResult::Success;
 }

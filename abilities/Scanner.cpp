@@ -1,9 +1,11 @@
 #include "Scanner.h"
 
 
-Scanner::Scanner(int x, int y) : x(x), y(y) {}
+Scanner::Scanner(int x, int y, GameField& field) : x(x), y(y), field(field) {}
 
-bool Scanner::apply(GameField &field) {
+
+
+AbilityResult Scanner::apply() {
     int width = field.getWidth();
     int height = field.getHeight();
     bool flag = false;
@@ -17,13 +19,12 @@ bool Scanner::apply(GameField &field) {
                 int index = cell.getIndexOfSegment();
                 if (cell.getPointerToShip()->getSegmentState(index) != SegmentState::Destroyed){
                     flag = true;
-                    std::cout << "Ship segment detected at: (" << j << ", " << i << ")\n";
                 }
             }
         }
     }
-    if (!flag) {
-        std::cout << "Ship segment not detected in this area\n";
+    if (flag) {
+        return AbilityResult::ShipDetected;
     }
-    return flag;
+    return AbilityResult::ShipNotDetected;
 }

@@ -13,7 +13,7 @@ public:
 
     std::vector<Ship> &getShips();
     Ship& getShipByIndex(int index);
-
+    bool isAllShipsDestroyed();
 };
 
 

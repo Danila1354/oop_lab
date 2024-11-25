@@ -7,8 +7,11 @@
 #include <random>
 
 class Bombardment : public Ability {
+private:
+    ShipManager &ship_manager;
 public:
-    bool apply(GameField &field) override;
+    Bombardment(ShipManager &ship_manager);
+    AbilityResult apply() override;
 };
 
 

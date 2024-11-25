@@ -1,14 +1,10 @@
 #include "BombardmentBuilder.h"
 
-void BombardmentBuilder::setCoords(int, int) {}
 
-std::unique_ptr<Ability> BombardmentBuilder::build() const {
-    return std::make_unique<Bombardment>();
+std::shared_ptr<Ability> BombardmentBuilder::build(InfoHolder &info_holder) const {
+    return std::make_shared<Bombardment>(info_holder.ship_manager);
 }
 
-AbilityType BombardmentBuilder::getType() const {
-    return AbilityType::Bombardment;
-}
-void BombardmentBuilder::printInfo() {
-    std::cout<<"Bombardment ability is applied"<<'\n';
+std::string BombardmentBuilder::getAbilityName() const {
+    return "Bombardment";
 }

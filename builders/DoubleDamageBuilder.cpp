@@ -1,18 +1,13 @@
 #include "DoubleDamageBuilder.h"
 
-void DoubleDamageBuilder::setCoords(int x, int y) {
-    this->x = x;
-    this->y = y;
+std::shared_ptr<Ability> DoubleDamageBuilder::build(InfoHolder &info_holder) const {
+    CoordHolder &coord_holder = info_holder.coord_holder;
+    coord_holder.readCoords();
+    auto[x,y] = coord_holder.get_coords();
+    return std::make_shared<DoubleDamage>(x,y,info_holder.field);
 }
 
-std::unique_ptr<Ability> DoubleDamageBuilder::build() const {
-    return std::make_unique<DoubleDamage>(x, y);
+std::string DoubleDamageBuilder::getAbilityName() const {
+    return "DoubleDamage";
 }
 
-AbilityType DoubleDamageBuilder::getType() const {
-    return AbilityType::DoubleDamage;
-}
-
-void DoubleDamageBuilder::printInfo(){
-    std::cout<<"Double damage ability is applied"<<'\n';
-}

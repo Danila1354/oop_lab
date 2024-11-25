@@ -3,17 +3,13 @@
 
 #include "AbilityBuilder.h"
 #include "Bombardment.h"
+#include "CoordHolder.h"
 
 
 class BombardmentBuilder : public AbilityBuilder {
 public:
-    void setCoords(int, int) override;
-
-    std::unique_ptr<Ability> build() const override;
-
-    void printInfo() override;
-
-    AbilityType getType() const override;
+    std::shared_ptr<Ability> build(InfoHolder &info_holder) const override;
+    std::string getAbilityName() const override;
 };
 
 

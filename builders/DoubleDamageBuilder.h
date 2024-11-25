@@ -8,13 +8,8 @@ class DoubleDamageBuilder : public AbilityBuilder {
 private:
     int x, y;
 public:
-    void setCoords(int x, int y) override;
-
-    std::unique_ptr<Ability> build() const override;
-
-    void printInfo() override;
-
-    AbilityType getType() const override;
+    std::shared_ptr<Ability> build(InfoHolder &info_holder) const override;
+    std::string getAbilityName() const override;
 };
 
 

@@ -17,3 +17,12 @@ Ship& ShipManager::getShipByIndex(int index){
     throw InvalidShipIndexException();
 
 }
+
+bool ShipManager::isAllShipsDestroyed() {
+    for (auto &ship: ships) {
+        if (!ship.isShipDestroyed()) {
+            return false;
+        }
+    }
+    return true;
+}

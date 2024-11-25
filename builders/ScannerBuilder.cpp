@@ -1,18 +1,13 @@
 #include "ScannerBuilder.h"
 
-void ScannerBuilder::setCoords(int x, int y) {
-    this->x = x;
-    this->y = y;
+
+std::shared_ptr<Ability> ScannerBuilder::build(InfoHolder &info_holder) const {
+    CoordHolder &coord_holder = info_holder.coord_holder;
+    coord_holder.readCoords();
+    auto[x,y] = coord_holder.get_coords();
+    return std::make_shared<Scanner>(x, y, info_holder.field);
 }
 
-std::unique_ptr<Ability> ScannerBuilder::build() const {
-    return std::make_unique<Scanner>(x, y);
-}
-
-AbilityType ScannerBuilder::getType() const {
-    return AbilityType::Scanner;
-}
-
-void ScannerBuilder::printInfo(){
-    std::cout<<"Scanner ability is applied"<<'\n';
+std::string ScannerBuilder::getAbilityName() const {
+    return "Scanner";
 }

@@ -1,6 +1,6 @@
 #include "Cell.h"
 
-Cell::Cell() : is_open(false), status(Status::Empty), pointer_to_ship(nullptr),
+Cell::Cell() : is_open(true), status(Status::Empty), pointer_to_ship(nullptr),
 index_of_segment(-1) {}
 
 
