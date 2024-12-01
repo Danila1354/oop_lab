@@ -9,9 +9,9 @@ class InfoHolder {
 public:
     GameField &field;
     ShipManager &ship_manager;
-    CoordHolder &coord_holder;
-    InfoHolder(GameField &field, ShipManager &ship_manager, CoordHolder &coord_holder) : field(field), ship_manager
-    (ship_manager), coord_holder(coord_holder) {}
+    CoordHolder coord_holder;
+    InfoHolder(GameField &field, ShipManager &ship_manager) : field(field), ship_manager
+    (ship_manager), coord_holder(CoordHolder()) {}
 };
 
 

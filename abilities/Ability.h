@@ -4,10 +4,12 @@
 
 enum class AbilityResult{
     Success,
+    DoubleAttack,
     ShipDestroyed,
     ShipDetected,
     AllShipsDestroyed,
-    ShipNotDetected
+    ShipNotDetected,
+    None
 };
 class Ability {
 public:

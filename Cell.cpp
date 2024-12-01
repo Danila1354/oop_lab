@@ -1,6 +1,6 @@
 #include "Cell.h"
 
-Cell::Cell() : is_open(true), status(Status::Empty), pointer_to_ship(nullptr),
+Cell::Cell(bool is_open) : is_open(is_open), status(Status::Empty), pointer_to_ship(nullptr),
 index_of_segment(-1) {}
 
 
@@ -18,7 +18,7 @@ void Cell::display() {
                 std::cout << u8"\U0001F7E5";
             }
             else if (segment_state == SegmentState::FULL){
-                std::cout<<"❗";
+                std::cout<<u8"\U0001F6A2";
             }
             else {
                 std::cout << "❌";

@@ -14,6 +14,9 @@ public:
     std::vector<Ship> &getShips();
     Ship& getShipByIndex(int index);
     bool isAllShipsDestroyed();
+
+    friend std::ostream &operator<<(std::ostream &out, ShipManager &ship_manager);
+    friend std::istream &operator>>(std::istream &in, ShipManager &ship_manager);
 };
 
 

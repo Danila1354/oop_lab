@@ -16,7 +16,7 @@ private:
 
 
 public:
-    Cell();
+    Cell(bool is_open = false);
 
     void display();
 

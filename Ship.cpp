@@ -60,5 +60,9 @@ SegmentState Ship::getSegmentState(int index) {
     return segments[index];
 }
 
+void Ship::setSegmentState(int index, SegmentState state) {
+    segments[index] = state;
+}
+
 
 

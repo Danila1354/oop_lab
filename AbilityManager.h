@@ -9,23 +9,28 @@
 #include <queue>
 #include <random>
 #include <Logger.h>
+#include <unordered_map>
+#include <functional>
 
 class AbilityManager {
 private:
     std::queue<std::shared_ptr<AbilityBuilder>> ability_builders;
-    std::vector<std::shared_ptr<AbilityBuilder>> all_ability_builders;
+    std::unordered_map<std::string, std::shared_ptr<AbilityBuilder>> ability_builders_map;
     Logger logger;
+    void initializeAbilityBuilders();
+
+    void shuffleAbilityBuilders();
 public:
 
     AbilityManager();
 
-    void useAbility(InfoHolder& info_holder);
-
-    void initializeAbilityBuilders();
-
-    void shuffleAbilityBuilders();
+    AbilityResult useAbility(InfoHolder& info_holder);
 
     void addRandomAbility();
+
+    friend std::istream &operator>>(std::istream &in, AbilityManager &ability_manager);
+
+    friend std::ostream &operator<<(std::ostream &out, AbilityManager &ability_manager);
 };
 
 

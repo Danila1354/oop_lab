@@ -6,6 +6,9 @@
 #include "ShipManager.h"
 #include "OutOfBoundsAttackException.h"
 #include "ShipPlacementException.h"
+#include <sstream>
+
+
 
 class GameField {
 private:
@@ -23,7 +26,7 @@ private:
     void setShipCoords(Ship &ship, int x, int y, int ship_length);
 
 public:
-    GameField(int width, int height);
+    GameField(int width, int height, bool is_open_cells = false);
 
     GameField(const GameField &other);
 
@@ -33,7 +36,7 @@ public:
 
     GameField &operator=(GameField &&other);
 
-    bool attackCell(int x, int y);
+    bool attackCell(int x, int y, bool is_double_attack = false);
 
     void show();
 
@@ -44,6 +47,15 @@ public:
     int getWidth();
 
     int getHeight();
+
+    friend std::ostream &operator<<(std::ostream &out, GameField &field);
+
+    friend std::istream &operator>>(std::istream &in, GameField &field);
+
+    void loadFieldAndShips(std::istream &in, GameField &field, ShipManager &ship_manager);
+
+
+
 
 
 };

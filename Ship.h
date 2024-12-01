@@ -29,6 +29,8 @@ public:
     bool isVertical();
 
     SegmentState getSegmentState(int index);
+
+    void setSegmentState(int index, SegmentState state);
 };
 
 

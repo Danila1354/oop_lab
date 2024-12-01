@@ -5,7 +5,6 @@ void Logger::printAbilityInfo(std::string ability_name) {
 }
 
 void Logger::printAbilityResult(AbilityResult result) {
-    std::cout << "Ability result: ";
     switch (result) {
         case AbilityResult::Success:
             std::cout << "Ability successfully applied" << '\n';
