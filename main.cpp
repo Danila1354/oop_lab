@@ -7,6 +7,31 @@
 #include "Game.h"
 
 
+class InputHandler {
+public:
+    char getInput() {
+        char command;
+        std::cin >> command;
+        return command;
+    }
+
+
+};
+
+template <typename InputHandler>
+class GameController {
+private:
+    Game &game; // ссылка на игру
+    InputHandler &inputHandler; // ссылка на обработчик ввода
+
+public:
+    GameController(Game &g, InputHandler &handler) : game(g), inputHandler(handler) {}
+
+    void executeCommand() {
+        char command = inputHandler.getInput();  // получаем ввод
+
+    }
+};
 
 int main() {
     GameField player_field(10, 10, true);

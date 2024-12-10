@@ -9,7 +9,7 @@ AbilityResult Player::useAbility(Character &enemy) {
         ability_result = ability_manager.useAbility(info_holder);
     }
     catch (NoAbilitiesException &e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        std::cerr << e.what() << std::endl;
     }
 }
 

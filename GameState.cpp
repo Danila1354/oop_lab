@@ -34,43 +34,22 @@ void GameState::resetRound() {
 }
 
 std::ostream &operator<<(std::ostream &out, GameState &game_state) {
-    std::vector<FileDataWrite> files = {
-            {"player_field.txt", [&game_state](std::ofstream& file) { file << game_state.player.getField(); }},
-            {"player_ship_manager.txt", [&game_state](std::ofstream& file) { file << game_state.player.getShipManager(); }},
-            {"player_ability_manager.txt", [&game_state](std::ofstream& file) { file << game_state.player.getAbilityManager(); }},
-            {"bot_field.txt", [&game_state](std::ofstream& file) { file << game_state.bot.getField(); }},
-            {"bot_ship_manager.txt", [&game_state](std::ofstream& file) { file << game_state.bot.getShipManager(); }}
-    };
-
-    out << game_state.round << '\n';
-    for (const auto& fileData : files) {
-        std::ofstream file(fileData.filename);
-        if (file.is_open()) {
-            fileData.writeFunc(file);
-        }
-    }
-
+    json j;
+    j["round"] = game_state.round;
+    game_state.bot.getField().to_json(j,false);
+    game_state.player.getAbilityManager().to_json(j);
+    game_state.player.getField().to_json(j,true);
+    out << j;
     return out;
 }
 
 std::istream &operator>>(std::istream &in, GameState &game_state) {
-
-
-    std::vector<FileDataRead> files = {
-            {"player_ship_manager.txt", [&game_state](std::ifstream& file) { file >> game_state.player.getShipManager(); }},
-            {"player_field.txt", [&game_state](std::ifstream& file) { game_state.player.getField().loadFieldAndShips(file, game_state.player.getField(), game_state.player.getShipManager()); }},
-            {"player_ability_manager.txt", [&game_state](std::ifstream& file) { file >> game_state.player.getAbilityManager(); }},
-            {"bot_ship_manager.txt", [&game_state](std::ifstream& file) { file >> game_state.bot.getShipManager(); }},
-            {"bot_field.txt", [&game_state](std::ifstream& file) { game_state.bot.getField().loadFieldAndShips(file, game_state.bot.getField(), game_state.bot.getShipManager()); }}
-    };
-    in >> game_state.round;
-    for (const auto& fileData : files) {
-        std::ifstream file(fileData.filename);
-        if (file.is_open()) {
-            fileData.readFunc(file);
-        }
-    }
-
+    json j;
+    in >> j;
+    game_state.round = j["round"];
+    game_state.bot.getField().from_json(j,game_state.bot.getShipManager(),false);
+    game_state.player.getAbilityManager().from_json(j);
+    game_state.player.getField().from_json(j, game_state.player.getShipManager(),true);
     return in;
 }
 

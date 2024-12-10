@@ -48,18 +48,33 @@ void AbilityManager::addRandomAbility() {
     ability_builders.push(it->second);
 }
 
-std::ostream &operator<<(std::ostream &out, AbilityManager &ability_manager) {
-    for (auto& pair : ability_manager.ability_builders_map) {
-        out << pair.first << std::endl;
+
+
+void AbilityManager::to_json(json &j) {
+    std::queue<std::shared_ptr<AbilityBuilder>> temp;
+    while (!ability_builders.empty()) {
+        temp.push(ability_builders.front());
+        ability_builders.pop();
     }
-    return out;
+    if (temp.empty()){
+        j["abilities"] = "None";
+    } else {
+        j["abilities"] = json::array();
+        while (!temp.empty()) {
+            auto ability = temp.front();
+            ability_builders.push(ability);
+            temp.pop();
+            j["abilities"].push_back(ability->getAbilityName());
+        }
+    }
 }
 
-std::istream &operator>>(std::istream &in, AbilityManager &ability_manager) {
-    std::string ability_name;
-    while (in >> ability_name) {
-        auto it = ability_manager.ability_builders_map.find(ability_name);
-        ability_manager.ability_builders.push(it->second);
+void AbilityManager::from_json(const json &j) {
+    if (j["abilities"] == "None") {
+        ability_builders = std::queue<std::shared_ptr<AbilityBuilder>>();
+        return;
     }
-    return in;
+    for (auto &ability_name : j["abilities"]) {
+        ability_builders.push(ability_builders_map[ability_name]);
+    }
 }

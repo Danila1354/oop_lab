@@ -86,14 +86,14 @@ void Game::botMove() {
 
 void Game::saveGame() {
     {
-        std::ofstream file("save.txt");
+        std::ofstream file("save.json");
         file << game_state;
     }
 }
 
 void Game::loadGame() {
     {
-        std::ifstream file("save.txt");
+        std::ifstream file("save.json");
 
         if (!file.is_open()) {
             return start();

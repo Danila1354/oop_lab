@@ -70,10 +70,14 @@ bool GameField::attackCell(int x, int y, bool is_double_attack) {
     if (!checkCoords(x, y)) {
         throw OutOfBoundsAttackException();
     }
+
     if (!field[y][x].isOpen())
         field[y][x].open();
     if (field[y][x].getStatus() == Status::Occupied) {
         auto pointer_to_ship = field[y][x].getPointerToShip();
+        if (pointer_to_ship->isShipDestroyed()){
+            return false;
+        }
         auto index = field[y][x].getIndexOfSegment();
         pointer_to_ship->takeDamage(index);
         if (is_double_attack)
@@ -173,103 +177,104 @@ bool GameField::checkCoords(int x, int y) {
     return true;
 }
 
-std::ostream &operator<<(std::ostream &out, GameField &field) {
-    out << "height=" << field.getHeight() << "\n";
-    out << "width=" << field.getWidth() << "\n";
+void GameField::to_json(json &j,bool is_player_field){
+    j["height"] = this->getHeight();
+    j["width"] = this->getWidth();
+    json field_json = json::array();
+
     std::vector<int> ship_sizes;
     std::vector<std::pair<int, int>> ship_coords;
     std::vector<bool> is_vertical;
-    for (int i = 0; i < field.height; i++) {
-        for (int j = 0; j < field.width; j++) {
-            char is_open = field.field[i][j].isOpen() ? 'o' : 'c';
-            if (field.field[i][j].getStatus() == Status::Empty) {
-                out << "0" << is_open;
+
+    for (int i = 0; i < this->height; i++) {
+        json row = json::array();
+        for (int j = 0; j < this->width; j++) {
+            json cell_json;
+
+            char is_open = field[i][j].isOpen() ? 'o' : 'c';
+            cell_json["is_open"] = (is_open == 'o');
+
+            if (field[i][j].getStatus() == Status::Empty) {
+                cell_json["status"] = 0;
             } else {
-                auto segment_index = field.field[i][j].getIndexOfSegment();
-                auto segment_state = field.field[i][j].getPointerToShip()->getSegmentState(segment_index);
+                auto segment_index = field[i][j].getIndexOfSegment();
+                auto segment_state = field[i][j].getPointerToShip()->getSegmentState(segment_index);
+
                 if (segment_state == SegmentState::FULL) {
-                    out << "3" << is_open;
+                    cell_json["status"] = 3;
                 } else if (segment_state == SegmentState::Damaged) {
-                    out << "2" << is_open;
+                    cell_json["status"] = 2;
                 } else {
-                    out << "1" << is_open;
-                }
-                if (segment_index == 0) {
-                    ship_sizes.push_back(field.field[i][j].getPointerToShip()->getLength());
-                    ship_coords.emplace_back(j, i);
-                    is_vertical.push_back(field.field[i][j].getPointerToShip()->isVertical());
+                    cell_json["status"] = 1;
                 }
 
+                if (segment_index == 0) {
+                    ship_sizes.push_back(field[i][j].getPointerToShip()->getLength());
+                    ship_coords.emplace_back(j, i);
+                    is_vertical.push_back(field[i][j].getPointerToShip()->isVertical());
+                }
             }
+
+            row.push_back(cell_json);
         }
-        if (i != field.height - 1) {
-            out << '\n';
-        }
+        field_json.push_back(row);
     }
-    for (int i = 0; i < ship_sizes.size(); i++) {
-        out << '\n' << ship_sizes[i] << " " << ship_coords[i].first << " " << ship_coords[i].second << " "
-            << is_vertical[i];
+    if (is_player_field)
+        j["player_field"] = field_json;
+    else
+        j["bot_field"] = field_json;
+    json ships_json = json::array();
+    for (size_t i = 0; i < ship_sizes.size(); i++) {
+        ships_json.push_back({
+                                     {"size", ship_sizes[i]},
+                                     {"x", ship_coords[i].first},
+                                     {"y", ship_coords[i].second},
+                                     {"is_vertical", is_vertical[i]}
+                             });
     }
-    return out;
+
+    j["ships"] = ships_json;
 }
 
-
-void GameField::loadFieldAndShips(std::istream &in, GameField &field, ShipManager &ship_manager) {
-    std::string line;
-    std::getline(in, line);
-    int height = 0, width = 0;
-    std::sscanf(line.c_str(), "height=%d", &height);
-    std::getline(in, line);
-    std::sscanf(line.c_str(), "width=%d", &width);
-    field = GameField(width, height);
-    for (int i = 0; i < height; i++) {
-        std::getline(in, line);
-    }
+void GameField::from_json(const json &j, ShipManager &ship_manager,bool is_player_field) {
+    *this = GameField(j["width"], j["height"]);
+    auto ships_json = j["ships"];
     std::vector<int> ship_sizes;
     std::vector<std::pair<int, int>> ship_coords;
     std::vector<bool> is_vertical;
-
-    while (std::getline(in, line)) {
-        std::istringstream ss(line);
-        int size, x, y, vertical;
-        ss >> size >> x >> y >> vertical;
-        ship_sizes.push_back(size);
-        ship_coords.push_back({x, y});
-        is_vertical.push_back(vertical);
+    for (size_t i = 0; i < ships_json.size(); i++) {
+        ship_sizes.push_back(ships_json[i]["size"]);
+        ship_coords.emplace_back(ships_json[i]["x"], ships_json[i]["y"]);
+        is_vertical.push_back(ships_json[i]["is_vertical"]);
     }
     ship_manager = ShipManager(ship_sizes.size(), ship_sizes);
     auto &ships = ship_manager.getShips();
-    for (int i = 0; i < ship_sizes.size(); i++) {
-        field.placeShip(ships[i], ship_coords[i].first, ship_coords[i].second, is_vertical[i]);
+    for (size_t i = 0; i < ship_sizes.size(); i++) {
+        placeShip(ships[i], ship_coords[i].first, ship_coords[i].second, is_vertical[i]);
     }
 
-    in.clear();
-    in.seekg(0, std::ios::beg);
-    std::getline(in, line);
-    std::getline(in, line);
 
-    for (int i = 0; i < height; ++i) {
-        std::getline(in, line);
-        int x = 0;
-        for (int j = 0; j < width; ++j) {
-            char status = line[x];
-            char is_open = line[x + 1];
-            x += 2;
-            if (status != '0') {
-                auto segment_index = field.field[i][j].getIndexOfSegment();
-                auto ship = field.field[i][j].getPointerToShip();
-                if (status == '3') {
+    auto field_json = j[is_player_field ? "player_field" : "bot_field"];
+    for (size_t i = 0; i < field_json.size(); i++) {
+        auto row = field_json[i];
+        for (size_t j = 0; j < row.size(); j++) {
+            auto cell_json = row[j];
+            if (cell_json["is_open"]) {
+                field[i][j].open();
+            }
+            if (cell_json["status"] != 0) {
+                auto segment_index = field[i][j].getIndexOfSegment();
+                auto ship = field[i][j].getPointerToShip();
+                if (cell_json["status"] == 3) {
                     ship->setSegmentState(segment_index, SegmentState::FULL);
-                } else if (status == '2') {
+                } else if (cell_json["status"] == 2) {
                     ship->setSegmentState(segment_index, SegmentState::Damaged);
-                } else if (status == '1') {
+                } else if (cell_json["status"] == 1) {
                     ship->setSegmentState(segment_index, SegmentState::Destroyed);
                 }
             }
-            if (is_open == 'o') {
-                field.getCell(j, i).open();
-            }
         }
     }
-
 }
+
+

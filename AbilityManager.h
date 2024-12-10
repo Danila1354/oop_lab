@@ -28,9 +28,9 @@ public:
 
     void addRandomAbility();
 
-    friend std::istream &operator>>(std::istream &in, AbilityManager &ability_manager);
+    void to_json(json &j);
 
-    friend std::ostream &operator<<(std::ostream &out, AbilityManager &ability_manager);
+    void from_json(const json &j);
 };
 
 

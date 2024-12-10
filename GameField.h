@@ -7,6 +7,8 @@
 #include "OutOfBoundsAttackException.h"
 #include "ShipPlacementException.h"
 #include <sstream>
+#include "json.hpp"
+using json = nlohmann::json;
 
 
 
@@ -48,11 +50,9 @@ public:
 
     int getHeight();
 
-    friend std::ostream &operator<<(std::ostream &out, GameField &field);
+    void to_json(json &j, bool is_player_field);
 
-    friend std::istream &operator>>(std::istream &in, GameField &field);
-
-    void loadFieldAndShips(std::istream &in, GameField &field, ShipManager &ship_manager);
+    void from_json(const json &j, ShipManager &ship_manager,bool is_player_field);
 
 
 
