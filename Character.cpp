@@ -14,18 +14,26 @@ void Character::attack(GameField &enemy_field, int x, int y) {
     enemy_field.attackCell(x, y);
 }
 
-void Character::PlaceShips() {
-    int ships_coords[3][2] = {{5, 4},
-                              {1, 4},
-                              {9, 1}};
-    auto &ships = ship_manager.getShips();
-    bool positions[] = {false, false, true};
-    for (int i = 0; i < ships.size(); i++) {
-        try {
-            field.placeShip(ships[i], ships_coords[i][0], ships_coords[i][1], positions[i]);
-        }
-        catch (ShipPlacementException &e) {
-            std::cerr << "Error: " << e.what() << std::endl;
+void Character::randomPlaceShips() {
+    auto& ships = ship_manager.getShips();
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> width_dist(0, field.getWidth() - 1);
+    std::uniform_int_distribution<> height_dist(0, field.getHeight() - 1);
+    std::uniform_int_distribution<> orientation_dist(0, 1);
+
+    for (auto &ship : ships) {
+        while (true) {
+            int x = width_dist(gen);
+            int y = height_dist(gen);
+            bool is_vertical = orientation_dist(gen);
+            try {
+                field.placeShip(ship, x, y, is_vertical);
+                break;
+            } catch (ShipPlacementException &e) {
+                continue;
+            }
         }
     }
 }
+

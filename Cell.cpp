@@ -4,31 +4,6 @@ Cell::Cell(bool is_open) : is_open(is_open), status(Status::Empty), pointer_to_s
 index_of_segment(-1) {}
 
 
-void Cell::display() {
-    if (is_open) {
-        if (status == Status::Empty)
-            std::cout << "⚪";
-        else {
-            if (pointer_to_ship->isShipDestroyed()) {
-                std::cout << "🔥";
-                return;
-            }
-            SegmentState segment_state = pointer_to_ship->getSegmentState(index_of_segment);
-            if (segment_state == SegmentState::Damaged) {
-                std::cout << u8"\U0001F7E5";
-            }
-            else if (segment_state == SegmentState::FULL){
-                std::cout<<u8"\U0001F6A2";
-            }
-            else {
-                std::cout << "❌";
-            }
-
-        }
-    } else
-        std::cout << "⬜\uFE0F";
-}
-
 void Cell::open() {
     is_open = true;
 }

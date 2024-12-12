@@ -13,13 +13,19 @@ bool GameState::isBotWin() {
 
 void GameState::resetPlayer() {
     player.getField() = GameField(10, 10, true);
-    player.getShipManager() = ShipManager(3, {1,2,3});
+    int number_of_ships = player.getShipManager().getShips().size();
+    std::vector<int> ship_sizes = player.getShipManager().getShipsLengths();
+    player.getShipManager() = ShipManager(number_of_ships, ship_sizes);
     player.getAbilityManager() = AbilityManager();
+    player.randomPlaceShips();
 }
 
 void GameState::resetBot() {
     bot.getField() = GameField(10, 10);
-    bot.getShipManager() = ShipManager(3, {1,2,3});
+    int number_of_ships = bot.getShipManager().getShips().size();
+    std::vector<int> ship_sizes = bot.getShipManager().getShipsLengths();
+    bot.getShipManager() = ShipManager(number_of_ships, ship_sizes);
+    bot.randomPlaceShips();
 }
 
 void GameState::resetGame() {

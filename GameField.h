@@ -40,8 +40,6 @@ public:
 
     bool attackCell(int x, int y, bool is_double_attack = false);
 
-    void show();
-
     void placeShip(Ship &ship, int x, int y, bool is_vertical);
 
     Cell& getCell(int x, int y);

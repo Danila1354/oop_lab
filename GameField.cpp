@@ -87,17 +87,6 @@ bool GameField::attackCell(int x, int y, bool is_double_attack) {
     return false;
 }
 
-void GameField::show() {
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            field[i][j].display();
-            std::cout << ' ';
-        }
-        std::cout << '\n';
-    }
-    std::cout << '\n';
-}
-
 
 bool GameField::checkCollide(int x, int y) {
     int row_above = y - 1;
@@ -232,13 +221,15 @@ void GameField::to_json(json &j,bool is_player_field){
                                      {"is_vertical", is_vertical[i]}
                              });
     }
-
-    j["ships"] = ships_json;
+    if (is_player_field)
+        j["player_ships"] = ships_json;
+    else
+        j["bot_ships"] = ships_json;
 }
 
 void GameField::from_json(const json &j, ShipManager &ship_manager,bool is_player_field) {
     *this = GameField(j["width"], j["height"]);
-    auto ships_json = j["ships"];
+    auto ships_json = j[is_player_field ? "player_ships" : "bot_ships"];
     std::vector<int> ship_sizes;
     std::vector<std::pair<int, int>> ship_coords;
     std::vector<bool> is_vertical;

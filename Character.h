@@ -12,9 +12,10 @@ public:
     Character(GameField &field, ShipManager &ship_manager);
 
     virtual void attack(GameField &enemy_field, int x, int y);
-    void PlaceShips();
+    void randomPlaceShips();
     GameField &getField();
     ShipManager &getShipManager();
+
 };
 
 #endif //OOP_LAB2_CHARACTER_H

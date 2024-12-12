@@ -18,7 +18,6 @@ private:
 public:
     Cell(bool is_open = false);
 
-    void display();
 
     void open();
 

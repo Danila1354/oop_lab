@@ -27,18 +27,11 @@ bool ShipManager::isAllShipsDestroyed() {
     return true;
 }
 
-std::ostream &operator<<(std::ostream &out, ShipManager &ship_manager) {
-    for (auto &ship : ship_manager.ships) {
-        out << ship.getLength() << std::endl;
-    }
-    return out;
-}
 
-std::istream &operator>>(std::istream &in, ShipManager &ship_manager) {
-    int ship_size;
-//    ship_manager.ships.clear();
-    while (in >> ship_size) {
-        ship_manager.ships.emplace_back(Ship(ship_size));
+std::vector<int> ShipManager::getShipsLengths() {
+    std::vector<int> ship_lengths;
+    for (auto &ship: ships) {
+        ship_lengths.push_back(ship.getLength());
     }
-    return in;
+    return ship_lengths;
 }
